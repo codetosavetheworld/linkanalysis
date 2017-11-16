@@ -4,10 +4,10 @@ import json
 import requests
 
 app = Flask(__name__)
-crawlingBaseURL = ""
+crawling_baseURL = ""
 
 @app.route("/receiveSessionID")
-def receiveSessionID():
+def receive_sessionID():
     # Gets the session ID from request data
     sessionID = request.args.get("sessionID")
     if (sessionID == None):
@@ -29,14 +29,14 @@ def receiveSessionID():
         # Makes request to crawling for session information
         # sessionInfo = getSessionInformation(sessionID)
 
-        sessionInfo = makeSampleSessionInfo()
-        sessionInfo = json.loads(sessionInfo)
-        parseSessionInformation(sessionInfo)
+        session_info = make_sample_session_info()
+        session_info = json.loads(session_info)
+        parse_session_information(session_info)
 
 
-def getSessionInformation(sessionID):
+def get_session_information(sessionID):
 
-    endpoint = crawlingBaseURL + "/sessionInformation"
+    endpoint = crawling_baseURL + "/sessionInformation"
     params = {
         "sessionID": sessionID
     }
@@ -46,38 +46,38 @@ def getSessionInformation(sessionID):
     else:
         return r.json
 
-def parseSessionInformation(sessionInfo):
-    sessionID = sessionInfo["sessionID"]
-    webpage = sessionInfo["link"]
-    dateLastUpdated = sessionInfo["dateLastUpdated"]
-    frequency = sessionInfo["frequency"]
-    outlinks = sessionInfo["outlinks"]
-    failedWebpages = sessionInfo["failedWebpages"]
-    for o in outlinks:
+def parse_session_information(session_info):
+    sessionID = session_info["sessionID"]
+    webpage = session_info["link"]
+    date_last_updated = session_info["date_last_updated"]
+    frequency = session_info["frequency"]
+    outlinks = session_info["outlinks"]
+    failed_webpages = session_info["failed_webpages"]
+#for o in outlinks:
 
 
 
 
 # --- Functions for premilimary testing (will be removed) ---
-def makeSampleSessionInfo():
-    sampleSessionInfo = {}
-    sampleSessionInfo["sessionID"] = 1
+def make_sample_session_info():
+    sample_session_info = {}
+    sample_session_info["sessionID"] = 1
 
-    sampleLink = {}
-    sampleLink["link"] = "www.example.com"
-    sampleLink["dateLastUpdated"] = "2017-05-20"
-    sampleLink["frequency"] = "daily"
+    sample_link = {}
+    sample_link["link"] = "www.example.com"
+    sample_link["date_last_updated"] = "2017-05-20"
+    sample_link["frequency"] = "daily"
 
-    sampleOutlink = {}
-    sampleOutlink["link"] = "www.example2.com"
-    sampleOutlink["tags"] = ["h1"]
-    sampleLink["outlinks"] = [sampleOutlink]
+    sample_outlink = {}
+    sample_outlink["link"] = "www.example2.com"
+    sample_outlink["tags"] = ["h1"]
+    sample_link["outlinks"] = [sample_outlink]
 
-    sampleSessionInfo["webpages"] = [sampleLink]
-    sampleSession["failedWebpages"] = ["www.example3.com"]
+    sample_session_info["webpages"] = [sample_link]
+    sample_session["failedWebpages"] = ["www.example3.com"]
 
-    jsonData = json.dumps(sampleSessionInfo)
-    return jsonData
+    json_data = json.dumps(sampleSessionInfo)
+    return json_data
 
 if __name__ == "__main__":
     app.config['DEBUG'] = True

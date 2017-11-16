@@ -1,11 +1,11 @@
 # NOTES: calculatedFrequency is going to be in terms of hours or days? currently in hours
 
 from py2neo import Graph, Node, Relationship
-from py2neo.server import GraphSever
+#from py2neo.server import GraphSever
 class Network():
 	def __init__(self):
-                self.server = GraphSever()
-                self.server.start()
+    #self.server = GraphSever()
+    #self.server.start()
 		self.graphInstance = Graph()
 		self.tx = self.graphInstance.begin()
 
@@ -13,12 +13,13 @@ class Network():
 		calculatedFrequency = convertFrequencyToHours(frequency)
 		n = Node(link, dateLastUpdated = dateLastUpdated, frequency = frequency, calculatedFrequency = calculatedFrequency)
 		self.tx.create(n)
-        
-        def addEdge(self, nodeu, nodev, relation):
-                self.tx.create(Relationship(nodeu,"links to",nodev,tag = relation))
-
-
             
+    def addEdge(self, nodeu, nodev, relation):
+        self.tx.create(Relationship(nodeu,"links to",nodev,tag = relation))
+            
+  
+    
+    
 
 
 	# def addOutlink()
@@ -41,4 +42,4 @@ class Network():
 
 
 n = Network()
-# n.addNode("www.example.com", "2015-05-02", "daily")
+n.addNode("www.example.com", "2015-05-02", "daily")
