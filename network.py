@@ -1,45 +1,38 @@
-# NOTES: calculatedFrequency is going to be in terms of hours or days? currently in hours
 
 from py2neo import Graph, Node, Relationship
-#from py2neo.server import GraphSever
+# from py2neo.server import GraphSever
+
 class Network():
-	def __init__(self):
-    #self.server = GraphSever()
-    #self.server.start()
-		self.graphInstance = Graph()
-		self.tx = self.graphInstance.begin()
+    def __init__(self):
+        # self.server = GraphSever()
+        # self.server.start()
+        self.graph_instance = Graph()
+        self.tx = self.graph_instance.begin()
 
-	def addNode(self, link, dateLastUpdated, frequency):
-		calculatedFrequency = convertFrequencyToHours(frequency)
-		n = Node(link, dateLastUpdated = dateLastUpdated, frequency = frequency, calculatedFrequency = calculatedFrequency)
-		self.tx.create(n)
-            
-    def addEdge(self, nodeu, nodev, relation):
-        self.tx.create(Relationship(nodeu,"links to",nodev,tag = relation))
-            
-  
-    
-    
+    def add_node(self, link, date_last_updated, frequency):
+        calculated_frequency = convert_frequency_to_hours(frequency)
+        n = Node(link, date_last_updated = date_last_updated, frequency = frequency, calculated_frequency = calculated_frequency)
+        self.tx.create(n)
+        
+    def add_edge(self, node_u, node_v, relation):
+            self.tx.create(Relationship(node_u, "links to", node_v, tag = relation))
 
-
-	# def addOutlink()
-        # We can use 0 to indicate always and -1 to indicate never
-	def convertFrequencyToHours(frequency):
-		if (frequency == "always" or frequency == ""):		# Unsure what to do for this?
-			return 0
-		if (frequency == "hourly"):
-			return 1
-		if (frequency == "daily"):
-			return 24
-		if (frequency == "weekly"):
-			return 7*24
-		if (frequency == "monthly"):
-			return 30*24
-		if (frequency == "yearly"):
-			return 365*24
-		if (frequency == "never"):	 						# Also this
-			return float("inf")
+def convert_frequency_to_hours(frequency):
+        if (frequency == "always" or frequency == ""):      
+            return 0
+        if (frequency == "hourly"):
+            return 1
+        if (frequency == "daily"):
+            return 24
+        if (frequency == "weekly"):
+            return 7*24
+        if (frequency == "monthly"):
+            return 30*24
+        if (frequency == "yearly"):
+            return 365*24
+        if (frequency == "never"):                          
+            return -1
 
 
 n = Network()
-n.addNode("www.example.com", "2015-05-02", "daily")
+n.add_node("www.example.com", "2015-05-02", "daily")
