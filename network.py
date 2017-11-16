@@ -7,10 +7,10 @@ class Network():
         # self.server = GraphSever()
         # self.server.start()
         self.graph_instance = Graph()
+
     
     
     def add_node(self, link, date_last_updated, frequency):
-        print("here")
         calculated_frequency = convert_frequency_to_hours(frequency)
         n = Node(link, date_last_updated = date_last_updated, frequency = frequency, calculated_frequency = calculated_frequency)
         self.graph_instance.create(n)
@@ -33,6 +33,9 @@ def convert_frequency_to_hours(frequency):
         return 365*24
     if (frequency == "never"):
         return -1
+
+
+
 
 
 n = Network()
