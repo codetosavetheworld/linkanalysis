@@ -53,8 +53,8 @@ def parse_session_information(session_info):
     frequency = session_info["frequency"]
     outlinks = session_info["outlinks"]
     failed_webpages = session_info["failed_webpages"]
-#for o in outlinks:
 
+    # Add session data to network 
 
 
 

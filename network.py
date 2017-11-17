@@ -65,9 +65,6 @@ def convert_frequency_to_hours(frequency):
         return -1
 
 
-
-
-
 n = Network()
 #just for test
 n.add_node("www.example.com", "2015-05-02", "daily")
