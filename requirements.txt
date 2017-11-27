@@ -1,5 +1,4 @@
 flask
 ast
 requests
-urllib
 py2neo
