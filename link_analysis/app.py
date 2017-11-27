@@ -5,8 +5,11 @@ import requests
 import network
 import ast
 
-
 app = Flask(__name__)
+
+@app.route("/")
+def welcomePage():
+    return "<html><body><h1>Team QQ:Link Analysis</h1></body></html>"
 
 @app.route("/prioritizedOutlinks", methods=["POST"])
 def send_prioritized_outlinks():
@@ -117,4 +120,4 @@ def send_no_arguments_error():
 
 if __name__ == "__main__":
 	app.config['DEBUG'] = True
-	app.run(host="127.0.0.1", port=80, threaded=True)
+	app.run(host="0.0.0.0", threaded=True)
