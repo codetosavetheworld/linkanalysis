@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def welcomePage():
-    return "<html><body><h1>Team QQ:Link Analysis</h1></body></html>"
+    return "<html><body><h1>Team QQ: Link Analysis</h1><p>Team Members: Sara Khedr, Xini Yang, Enoush Neupane</p></body></html>"
 
 @app.route("/prioritizedOutlinks", methods=["POST"])
 def send_prioritized_outlinks():
