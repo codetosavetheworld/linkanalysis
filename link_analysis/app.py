@@ -3,39 +3,27 @@ import sys
 import json
 import requests
 import network
+import ast
+
 
 app = Flask(__name__)
-crawling_url = ""
-ranking_url = ""
 
 @app.route("/prioritizedOutlinks", methods=["POST"])
 def send_prioritized_outlinks():
 	if request.data:
 		json_data = request.get_json()
-		parse_session_information(json_data)
+		parse_success = parse_session_information(json_data)
+		if (parse_success == -1):
+			return send_incorrect_json_error()
 
-		prioritized_links = []
-
-		response_data = {}
-		response_data["prioritizedLinks"] = prioritized_links
-		response = app.response_class(
-			response = json.dumps(response_data),
-			status = 200,
-			mimetype='application/json'
-		)
-		return response
+		prioritized_outlinks = []
+		return send_outlinks_response(prioritized_outlinks)
+		
 	else:
-		sys.stderr.write("ERROR: Cannot get POSTed data from ranking\n")
-		response_message = {}
-		response_message["text"] = "Cannot retrieve POSTed data"
-		response = app.response_class(
-			response = json.dumps(response_message),
-			status = 400,
-			mimetype = "application/json"
-		)
-		return response
+		return send_no_json_error()
 
 def parse_session_information(session_information):
+
     graph = network.Network()
     failed_webpages = session_information["failedWebpages"]
     graph.delete_failed_webpages(failed_webpages)
@@ -50,21 +38,82 @@ def parse_session_information(session_information):
             graph.delete_relationship(node_u)
             for o in outlinks:
                 graph.add_edge(node_u,o["links"],o["tags"])
+            return 0
         except:
-                send_incorrect_json_error()
+            return -1
 
 
+
+def send_outlinks_response(prioritized_outlinks):
+	response_data = {}
+	response_data["prioritizedLinks"] = prioritized_outlinks
+	response = app.response_class(
+		response = json.dumps(response_data),
+		status = 200,
+		mimetype='application/json'
+	)
+	return response
 
 def send_incorrect_json_error():
-	response_message = {}
-	response_message["text"] = "Incorrect JSON format"
+	sys.stderr.write("ERROR: Incorrect JSON format from crawling\n")
+	text = "Incorrect JSON format"
 	response = app.response_class(
-		response = json.dumps(response_message),
+		response = text,
 		status = 400,
 		mimetype = "application/json"
 	)
 	return response
 
+def send_no_json_error():
+	sys.stderr.write("ERROR: Cannot get POSTed data from crawling\n")
+	text = "Cannot retrieve POSTed data"
+	response = app.response_class(
+		response = text,
+		status = 400,
+		mimetype = "application/json"
+	)
+	return response
+
+@app.route("/pageRank", methods=["GET"])
+def send_page_rank():
+	print request
+	try:
+		webpages = ast.literal_eval(request.args.get("webpages"))
+		if (len(webpages) == 0):
+			return send_empty_list_error()
+		
+		page_rank_data = {}
+		return send_page_rank_response(page_rank_data)
+	except:
+		return send_no_arguments_error()
+
+def send_page_rank_response(page_rank_data):
+	response = app.response_class(
+		response = json.dumps(page_rank_data),
+		status = 200,
+		mimetype='application/json'
+	)
+	return response
+
+def send_empty_list_error():
+	sys.stderr.write("ERROR: Empty webpages list from ranking\n")
+	text = "Empty webpages list"
+	response = app.response_class(
+		response = text,
+		status = 400,
+		mimetype = "application/json"
+	)
+	return response
+
+def send_no_arguments_error():
+	sys.stderr.write("ERROR: Cannot get URL parameters from ranking\n")
+	text = "Cannot retrieve URL parameters"
+	response = app.response_class(
+		response = text,
+		status = 400,
+		mimetype = "application/json"
+	)
+	return response
 
 if __name__ == "__main__":
 	app.config['DEBUG'] = True
