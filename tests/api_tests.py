@@ -1,25 +1,42 @@
 import requests
 import json
+import urllib
 
 link_analysis_base_url = "http://127.0.0.1"
 
-def test_prioritized_outlinks():
+def test_prioritized_outlinks_API():
 	# Test no POSTed data
 	prioritized_links_endpoint = link_analysis_base_url + "/prioritizedOutlinks"
 	headers = {"Content-Type": "application/json", "Accept":"application/json"}
 	r = requests.post(prioritized_links_endpoint, headers=headers)
-	status_code = r.status_code
-	assert(status_code == 400)
+	assert(r.status_code == 400)
+	assert(r.text == "Cannot retrieve POSTed data")
 
+	# Test incorrectly POSTed data
+	data = make_incorrect_session_info()
+	r = requests.post(prioritized_links_endpoint, data=data, headers=headers)
+	assert(r.status_code == 400)
+	assert(r.text == "Incorrect JSON format")
+
+
+	# Test correctly POSTed data
 	data = make_sample_session_info()
 	r = requests.post(prioritized_links_endpoint, data=data, headers=headers)
-	status_code = r.status_code
-	assert(status_code == 200)
+	assert(r.status_code == 200)
+	
+
+# Makes incorrectly formatted JSON to post to /prioritizedOutlinks; incorrect 'webpage' key
+def make_incorrect_session_info():
+	sample_session_info = {}
+	sample_session_info["webpage"] = []
+	sample_session_info["failedWebpages"] = []
+	json_data = json.dumps(sample_session_info)
+	return json_data
 
 
+# Makes a correctly formatted JSON to post to /prioritizedOutlinks
 def make_sample_session_info():
     sample_session_info = {}
-    sample_session_info["sessionID"] = 1
 
     sample_link = {}
     sample_link["link"] = "www.example.com"
@@ -37,8 +54,26 @@ def make_sample_session_info():
     json_data = json.dumps(sample_session_info)
     return json_data
 
+def test_page_rank_API():
+	# Test no URL parameters
+	page_rank_endpoint = link_analysis_base_url + "/pageRank"
+	r = requests.get(page_rank_endpoint)
+	assert(r.status_code == 400)
+	assert(r.text == "Cannot retrieve URL parameters")
+	
+	# Test empty webpages list
+	params = {}
+	params["webpages"] = []
+	r = requests.get(page_rank_endpoint + "?" + urllib.urlencode(params))
+	assert(r.status_code == 400)
+	assert(r.text == "Empty webpages list")
 
+	# Test correctly formatted parameters
+	params["webpages"] = ["www.example.com"]
+	r = requests.get(page_rank_endpoint + "?" + urllib.urlencode(params))
+	assert(r.status_code == 200)
 
 if __name__ == "__main__":
-	test_prioritized_outlinks()
+	test_prioritized_outlinks_API()
+	test_page_rank_API()
 
