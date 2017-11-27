@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import sys
 import json
 import requests
+import network
 
 app = Flask(__name__)
 crawling_url = ""
@@ -35,20 +36,22 @@ def send_prioritized_outlinks():
 		return response
 
 def parse_session_information(session_information):
-	failed_webpages = session_information["failedWebpages"]
-	print "Need to remove failed webpage node and edges here"
-	for w in session_information["webpages"]:
-		try:
-			link = w["link"]
-			date_last_updated = w["date_last_updated"]
-			frequency = w["frequency"]
-			outlinks = w["outlinks"]
-			print "Need to add node here"
-			for o in outlinks:
-				print "Need to add node here"
-				print "Need to add edge here"
-		except:
-			send_incorrect_json_error()
+    graph = network.Network()
+    failed_webpages = session_information["failedWebpages"]
+    graph.delete_failed_webpages(failed_webpages)
+    for w in session_information["webpages"]:
+        try:
+            link = w["link"]
+            date_last_updated = w["date_last_updated"]
+            frequency = w["frequency"]
+            outlinks = w["outlinks"]
+            node_u = graph.get_node(link)
+            graph.add_node(link,date_last_updated,frequency)
+            graph.delete_relationship(node_u)
+            for o in outlinks:
+                graph.add_edge(node_u,o["links"],o["tags"])
+        except:
+                send_incorrect_json_error()
 
 
 
