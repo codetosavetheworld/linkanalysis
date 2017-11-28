@@ -48,7 +48,9 @@ class Network():
         return len(list(self.graph_instance.match(start_node = node_u, end_node = node_v, rel_type = "links to"))) > 0
 
     
-   def delete_failed_webpages(self,link):
+    def delete_failed_webpages(self,link):
+       if (self.check_node_exist(link) == False):
+           return 
        node = self.get_node(link)
        self.delete_relationship(node)
        self.delete_incoming_relationship(node)
@@ -152,34 +154,21 @@ class Network():
         raise Exception("pagerank failed to converge [%d iterations]"%(i+1))
 
 def convert_frequency_to_hours(frequency):
-    if (frequency == "always" or frequency == ""):
+    if (frequency == "always"):
         return 0
-    if (frequency == "hourly"):
+    elif (frequency == "hourly"):
         return 1
-    if (frequency == "daily"):
+    elif (frequency == "daily"):
         return 24
-    if (frequency == "weekly"):
+    elif (frequency == "weekly"):
         return 7*24
-    if (frequency == "monthly"):
+    elif (frequency == "monthly"):
         return 30*24
-    if (frequency == "yearly"):
+    elif (frequency == "yearly"):
         return 365*24
-    if (frequency == "never"):
+    elif (frequency == "never"):
         return -1
+    elif (frequency == ""):
+        return ""
 
-
-#more test cases in test.py
-# n = Network()
-# #just for test
-# n.add_node("www.example.com", "2015-05-02", "daily")
-# n.add_node("www.example2.com", "2017-07-02", "hourly")
-# n.add_node("www.example3.com", "2017-07-01", "hourly")
-
-# n1 = n.get_node("www.example.com")
-# n2 = n.get_node("www.example2.com")
-# n3 = n.get_node("www.example3.com")
-
-# n.add_edge(n1,n2,"<h1>")
-# n.add_edge(n3,n2,"<h1>")
-# n.add_edge(n1,n2,"<h3>")
 
