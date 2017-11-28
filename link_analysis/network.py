@@ -48,6 +48,13 @@ class Network():
         return len(list(self.graph_instance.match(start_node = node_u, end_node = node_v, rel_type = "links to"))) > 0
 
     
+   def delete_failed_webpages(self,link):
+       node = self.get_node(link)
+       self.delete_relationship(node)
+       self.delete_incoming_relationship(node)
+       self.graph_instance.delete(node)
+
+    
     def delete_relationship(self,node_u):
         rels = list(self.graph_instance.match(rel_type="links to",start_node= node_u,end_node = None))
         for r in rels:
