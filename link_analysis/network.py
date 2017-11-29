@@ -4,6 +4,7 @@ from py2neo import Graph, Node, Relationship
 import numpy as np
 import scipy
 import scipy.sparse
+import datetime
 
 class Network():
     def __init__(self):
@@ -16,20 +17,31 @@ class Network():
         # check if the node exist
         # if node not exist create a new node
         # if node exist update the node
-
+        calculated_frequency = convert_frequency_to_hours(frequency)
         if (not self.check_node_exist(link)):
             # Calculate initial calculated frequency
-            calculated_frequency = convert_frequency_to_hours(frequency)
             n = Node(link, date_last_updated = date_last_updated, frequency = frequency, calculated_frequency = calculated_frequency, link=link)
             self.graph_instance.create(n)
         else:
-            calculated_frequency = ""
             n = self.graph_instance.find_one(link)
+            if (n["date_last_updated"] != ""):
+                calculated_frequency = self._update_calculated_frequency(n["date_last_updated"], date_last_updated)
             n["date_last_updated"] = date_last_updated
             n["calculated_frequency"] = calculated_frequency
             n["frequency"] = frequency
             n.push()
         return n
+
+
+    # Measures calculated frequency from subtracting previous date_last_updated to current date_last_updated (returns time in hours)
+    def _update_calculated_frequency(self, prev_date_updated, new_date_updated):
+        try:
+            prev_date = datetime.datetime.strptime(prev_date_updated, "%Y-%m-%d")
+            new_date = datetime.datetime.strptime(new_date_updated, "%Y-%m-%d")
+            td = new_date - prev_date
+            return td.total_seconds() // 3600
+        except:
+            return -1
 
 
     def add_edge(self, node_u, node_v, relationship):
@@ -41,7 +53,6 @@ class Network():
             for l in list(self.graph_instance.match(start_node = node_u, end_node = node_v, rel_type = "links_to")):
                 l["tag"] = relationship
                 l.push()
-
 
     def check_node_exist(self, link):
         return len(list(self.graph_instance.find(link))) != 0

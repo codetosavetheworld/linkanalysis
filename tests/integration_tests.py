@@ -23,7 +23,6 @@ def test_sample_session_create():
 	assert(json_data["frequency"] == "daily")
 	assert("example2.com" in json_data["outlinks"])
 	assert("example3.com" in json_data["outlinks"])
-	# assert(json_data["calculated_frequency"] == "")
 
 	params["link"] = "example2.com"
 	r = requests.get(link_analysis_base_url + "/getWebpageData" + "?" + urllib.urlencode(params))
@@ -55,6 +54,7 @@ def test_sample_session_edit():
 	json_data = json.loads(r.text)
 	assert(json_data["date_last_updated"] == "2017-06-02")
 	assert(json_data["frequency"] == "never")
+	assert(json_data["calculated_frequency"] == 312.0)
 
 def test_sample_session_delete():
 	# Test the correct deletion of resources
