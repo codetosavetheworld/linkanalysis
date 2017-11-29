@@ -3,25 +3,87 @@ import json
 import urllib
 
 link_analysis_base_url = "http://127.0.0.1"
+prioritized_links_endpoint = link_analysis_base_url + "/prioritizedOutlinks"
+headers = {"Content-Type": "application/json", "Accept":"application/json"}
 
 def test_sample_session_create():
-	prioritized_links_endpoint = link_analysis_base_url + "/prioritizedOutlinks"
-	headers = {"Content-Type": "application/json", "Accept":"application/json"}
-	
-	# Test the correct creation/edit of resources
+	# Send sample POST session information
 	create_json = session_create_json()
 	r = requests.post(prioritized_links_endpoint, data=create_json, headers=headers)
 	assert (r.status_code == 200)
 
+	# Verify relationships and attributes
+	params = {}
+	params["link"] = "example.com"
+	r = requests.get(link_analysis_base_url + "/getWebpageData" + "?" + urllib.urlencode(params))
+	json_data = json.loads(r.text)
+	print json_data
+	assert(json_data["inlinks"] == [])
+	assert(json_data["date_last_updated"] == "2017-05-20")
+	assert(json_data["frequency"] == "daily")
+	assert("example2.com" in json_data["outlinks"])
+	assert("example3.com" in json_data["outlinks"])
+	# assert(json_data["calculated_frequency"] == "")
+
+	params["link"] = "example2.com"
+	r = requests.get(link_analysis_base_url + "/getWebpageData" + "?" + urllib.urlencode(params))
+	json_data = json.loads(r.text)
+	assert(json_data["inlinks"] == ["example.com"])
+	assert(json_data["date_last_updated"] == "")
+	assert(json_data["frequency"] == "")
+	assert(json_data["outlinks"] == [])
+	assert(json_data["calculated_frequency"] == "")
+
+	params["link"] = "example3.com"
+	r = requests.get(link_analysis_base_url + "/getWebpageData" + "?" + urllib.urlencode(params))
+	assert(json_data["inlinks"] == ["example.com"])
+	assert(json_data["date_last_updated"] == "")
+	assert(json_data["frequency"] == "")
+	assert(json_data["outlinks"] == [])
+	assert(json_data["calculated_frequency"] == "")
+
+def test_sample_session_edit():
+	# Send sample POST session information with changes to webpage metadata
 	create_json = session_create_json2()
 	r = requests.post(prioritized_links_endpoint, data=create_json, headers=headers)
 	assert (r.status_code == 200)
 
+	# Verify relationships and attributes
+	params = {}
+	params["link"] = "example.com"
+	r = requests.get(link_analysis_base_url + "/getWebpageData" + "?" + urllib.urlencode(params))
+	json_data = json.loads(r.text)
+	assert(json_data["date_last_updated"] == "2017-06-02")
+	assert(json_data["frequency"] == "never")
+
+def test_sample_session_delete():
 	# Test the correct deletion of resources
 	delete_json = session_delete_json()
 	r = requests.post(prioritized_links_endpoint, data=delete_json, headers=headers)
 	assert(r.status_code == 200)
 
+	params = {}
+	params["link"] = "example.com"
+	r = requests.get(link_analysis_base_url + "/getWebpageData" + "?" + urllib.urlencode(params))
+	json_data = json.loads(r.text)
+	assert(r.text == "{}")
+
+	params["link"] = "example2.com"
+	r = requests.get(link_analysis_base_url + "/getWebpageData" + "?" + urllib.urlencode(params))
+	json_data = json.loads(r.text)
+	assert(json_data["inlinks"] == [])
+	assert(json_data["date_last_updated"] == "")
+	assert(json_data["frequency"] == "")
+	assert(json_data["outlinks"] == [])
+	assert(json_data["calculated_frequency"] == "")
+
+	params["link"] = "example3.com"
+	r = requests.get(link_analysis_base_url + "/getWebpageData" + "?" + urllib.urlencode(params))
+	assert(json_data["inlinks"] == [])
+	assert(json_data["date_last_updated"] == "")
+	assert(json_data["frequency"] == "")
+	assert(json_data["outlinks"] == [])
+	assert(json_data["calculated_frequency"] == "")
 
 def session_create_json():
 	sample_json = '''
@@ -82,3 +144,5 @@ def session_delete_json():
 
 if __name__ == "__main__":
 	test_sample_session_create()
+	test_sample_session_edit()
+	test_sample_session_delete()

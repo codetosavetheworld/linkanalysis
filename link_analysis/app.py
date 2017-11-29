@@ -113,6 +113,21 @@ def send_no_arguments_error():
 	)
 	return response
 
+# --- Internal Testing APIs ---
+
+@app.route("/getWebpageData", methods=["GET"])
+def send_webpage_data():
+	link = request.args.get("link")
+
+	webpage_data = graph.get_node_information(link)
+	response = app.response_class(
+		response = json.dumps(webpage_data),
+		status = 200,
+		mimetype = "application/json"
+	)
+	return response
+
+
 if __name__ == "__main__":
 	app.config['DEBUG'] = True
 	app.run(host="127.0.0.1", port=80, threaded=True)

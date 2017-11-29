@@ -16,12 +16,14 @@ class Network():
         # check if the node exist
         # if node not exist create a new node
         # if node exist update the node
-        calculated_frequency = convert_frequency_to_hours(frequency)
 
         if (not self.check_node_exist(link)):
-            n = Node(link, date_last_updated = date_last_updated, frequency = frequency, calculated_frequency = calculated_frequency)
+            # Calculate initial calculated frequency
+            calculated_frequency = convert_frequency_to_hours(frequency)
+            n = Node(link, date_last_updated = date_last_updated, frequency = frequency, calculated_frequency = calculated_frequency, link=link)
             self.graph_instance.create(n)
         else:
+            calculated_frequency = ""
             n = self.graph_instance.find_one(link)
             n["date_last_updated"] = date_last_updated
             n["calculated_frequency"] = calculated_frequency
@@ -34,9 +36,9 @@ class Network():
         #if the relationship not exist create new edge
         #else update the tag
         if not self.check_relationship_exist(node_u,node_v):
-            self.graph_instance.create(Relationship(node_u, "links to", node_v, tag = relationship))
+            self.graph_instance.create(Relationship(node_u, "links_to", node_v, tag = relationship))
         else:
-            for l in list(self.graph_instance.match(start_node = node_u, end_node = node_v, rel_type = "links to")):
+            for l in list(self.graph_instance.match(start_node = node_u, end_node = node_v, rel_type = "links_to")):
                 l["tag"] = relationship
                 l.push()
 
@@ -45,7 +47,7 @@ class Network():
         return len(list(self.graph_instance.find(link))) != 0
 
     def check_relationship_exist(self,node_u, node_v):
-        return len(list(self.graph_instance.match(start_node = node_u, end_node = node_v, rel_type = "links to"))) > 0
+        return len(list(self.graph_instance.match(start_node = node_u, end_node = node_v, rel_type = "links_to"))) > 0
 
     
     def delete_failed_webpages(self,link):
@@ -58,19 +60,52 @@ class Network():
 
     
     def delete_relationship(self,node_u):
-        rels = list(self.graph_instance.match(rel_type="links to",start_node= node_u,end_node = None))
+        rels = list(self.graph_instance.match(rel_type="links_to",start_node= node_u,end_node = None))
         for r in rels:
             self.graph_instance.separate(r)
 
 
     def delete_incoming_relationship(self,node_u):
-        rels = list(self.graph_instance.match(rel_type="links to",end_node= node_u,start_node = None))
+        rels = list(self.graph_instance.match(rel_type="links_to",end_node= node_u,start_node = None))
         for r in rels:
             self.graph_instance.separate(r)
 
 
     def get_node(self,link):
         return self.graph_instance.find_one(link)
+
+    def get_node_information(self, link):
+        check_node = self.graph_instance.data("MATCH (n {link: '" + link + "'} ) RETURN n")
+        if len(check_node) == 0:
+            return {}
+
+        n = self.get_node(link)
+        date_last_updated = n["date_last_updated"]
+        calculated_frequency = n["calculated_frequency"]
+        frequency = n["frequency"]
+
+        node_data = {}
+        node_data["date_last_updated"] = date_last_updated
+        node_data["calculated_frequency"] = calculated_frequency
+        node_data["frequency"] = frequency
+        node_data["outlinks"] = self.get_outlinks(link)
+        node_data["inlinks"] = self.get_inlinks(link)
+
+        return node_data
+
+    def get_outlinks(self, link):
+        outlink_data = self.graph_instance.data("MATCH (n {link: '" + link + "'} )-->(node) RETURN node")
+        outlinks = []
+        for o in outlink_data:
+            outlinks.append(o["node"]["link"])
+        return outlinks
+
+    def get_inlinks(self, link):
+        inlink_data = self.graph_instance.data("MATCH (n {link: '" + link + "'} )<--(node) RETURN node")
+        inlinks = []
+        for o in inlink_data:
+            inlinks.append(o["node"]["link"])
+        return inlinks
 
     def _to_matrix(self):
         #Get adjacency matrix of the neo4j graph
