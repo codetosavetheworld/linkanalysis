@@ -6,6 +6,7 @@ import network
 import ast
 
 app = Flask(__name__)
+graph = network.Network()
 
 @app.route("/")
 def welcomePage():
@@ -26,26 +27,24 @@ def send_prioritized_outlinks():
 		return send_no_json_error()
 
 def parse_session_information(session_information):
-
-    graph = network.Network()
-    failed_webpages = session_information["failedWebpages"]
-    graph.delete_failed_webpages(failed_webpages)
-    for w in session_information["webpages"]:
-        try:
-            link = w["link"]
-            date_last_updated = w["date_last_updated"]
-            frequency = w["frequency"]
-            outlinks = w["outlinks"]
-            node_u = graph.get_node(link)
-            graph.add_node(link,date_last_updated,frequency)
-            graph.delete_relationship(node_u)
-            for o in outlinks:
-                graph.add_edge(node_u,o["links"],o["tags"])
-            return 0
-        except:
-            return -1
-
-
+	# try:
+	failed_webpages = session_information["failedWebpages"]
+	for w in failed_webpages:
+		graph.delete_failed_webpages(w)
+	for w in session_information["webpages"]:
+		link = w["link"]
+		date_last_updated = w["dateLastUpdated"]
+		frequency = w["frequency"]
+		outlinks = w["outlinks"]
+		# node_u = graph.get_node(link)
+		node_u = graph.add_node(link,date_last_updated,frequency)
+		# graph.delete_relationship(node_u)
+		for o in outlinks:
+			node_v = graph.add_node(o["link"], "", "")
+			graph.add_edge(node_u,node_v,o["tags"])
+		return 0
+	# except:
+	# 	return -1
 
 def send_outlinks_response(prioritized_outlinks):
 	response_data = {}
@@ -117,6 +116,21 @@ def send_no_arguments_error():
 		mimetype = "application/json"
 	)
 	return response
+
+# --- Internal Testing APIs ---
+
+@app.route("/getWebpageData", methods=["GET"])
+def send_webpage_data():
+	link = request.args.get("link")
+
+	webpage_data = graph.get_node_information(link)
+	response = app.response_class(
+		response = json.dumps(webpage_data),
+		status = 200,
+		mimetype = "application/json"
+	)
+	return response
+
 
 if __name__ == "__main__":
 	app.config['DEBUG'] = True

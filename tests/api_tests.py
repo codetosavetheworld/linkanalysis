@@ -18,7 +18,6 @@ def test_prioritized_outlinks_API():
 	assert(r.status_code == 400)
 	assert(r.text == "Incorrect JSON format")
 
-
 	# Test correctly POSTed data
 	data = make_sample_session_info()
 	r = requests.post(prioritized_links_endpoint, data=data, headers=headers)
@@ -40,7 +39,7 @@ def make_sample_session_info():
 
     sample_link = {}
     sample_link["link"] = "www.example.com"
-    sample_link["date_last_updated"] = "2017-05-20"
+    sample_link["dateLastUpdated"] = "2017-05-20"
     sample_link["frequency"] = "daily"
 
     sample_outlink = {}
