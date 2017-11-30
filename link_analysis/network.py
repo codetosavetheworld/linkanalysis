@@ -1,6 +1,6 @@
 
 from py2neo import Graph, Node, Relationship
-# from py2neo.server import GraphSever
+from py2neo.server import GraphSever
 import numpy as np
 import scipy
 import scipy.sparse
@@ -8,8 +8,8 @@ import datetime
 
 class Network():
     def __init__(self):
-        # self.server = GraphSever()
-        # self.server.start()
+        self.server = GraphSever()
+        self.server.start()
         self.graph_instance = Graph()
 
 
