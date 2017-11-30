@@ -76,13 +76,13 @@ def send_no_json_error():
 
 @app.route("/pageRank", methods=["GET"])
 def send_page_rank():
-	print request
 	try:
 		webpages = ast.literal_eval(request.args.get("webpages"))
 		if (len(webpages) == 0):
 			return send_empty_list_error()
-		
-		page_rank_data = {}
+		# ----- DOES NOT BELONG HERE -----
+		graph.update_pagerank()
+		page_rank_data = graph.get_ranking_data(webpages)
 		return send_page_rank_response(page_rank_data)
 	except:
 		return send_no_arguments_error()
