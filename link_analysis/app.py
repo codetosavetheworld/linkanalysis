@@ -8,6 +8,10 @@ import ast
 app = Flask(__name__)
 graph = network.Network()
 
+@app.route("/")
+def welcomePage():
+  return "<html><body><h1>Team QQ: Link Analysis</h1><p>Team Members: Sara Khedr, Xini Yang, Enosh Neupane</p></body></html>"
+
 @app.route("/prioritizedOutlinks", methods=["POST"])
 def send_prioritized_outlinks():
 	if request.data:
@@ -23,24 +27,24 @@ def send_prioritized_outlinks():
 		return send_no_json_error()
 
 def parse_session_information(session_information):
-	# try:
-	failed_webpages = session_information["failedWebpages"]
-	for w in failed_webpages:
-		graph.delete_failed_webpages(w)
-	for w in session_information["webpages"]:
-		link = w["link"]
-		date_last_updated = w["dateLastUpdated"]
-		frequency = w["frequency"]
-		outlinks = w["outlinks"]
-		# node_u = graph.get_node(link)
-		node_u = graph.add_node(link,date_last_updated,frequency)
-		# graph.delete_relationship(node_u)
-		for o in outlinks:
-			node_v = graph.add_node(o["link"], "", "")
-			graph.add_edge(node_u,node_v,o["tags"])
-		return 0
-	# except:
-	# 	return -1
+  try:
+  	failed_webpages = session_information["failedWebpages"]
+  	for w in failed_webpages:
+  		graph.delete_failed_webpages(w)
+  	for w in session_information["webpages"]:
+  		link = w["link"]
+  		date_last_updated = w["dateLastUpdated"]
+  		frequency = w["frequency"]
+  		outlinks = w["outlinks"]
+  		# node_u = graph.get_node(link)
+  		node_u = graph.add_node(link,date_last_updated,frequency)
+  		# graph.delete_relationship(node_u)
+  		for o in outlinks:
+  			node_v = graph.add_node(o["link"], "", "")
+  			graph.add_edge(node_u,node_v,o["tags"])
+  		return 0
+  except:
+	  return -1
 
 def send_outlinks_response(prioritized_outlinks):
 	response_data = {}
@@ -130,4 +134,4 @@ def send_webpage_data():
 
 if __name__ == "__main__":
 	app.config['DEBUG'] = True
-	app.run(host="127.0.0.1", port=80, threaded=True)
+	app.run(host="0.0.0.0", port=80, threaded=True)

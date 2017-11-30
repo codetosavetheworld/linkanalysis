@@ -2,7 +2,7 @@ import requests
 import json
 import urllib
 
-link_analysis_base_url = "http://127.0.0.1"
+link_analysis_base_url = "http://teamqq.cs.rpi.edu"
 
 def test_prioritized_outlinks_API():
 	# Test no POSTed data

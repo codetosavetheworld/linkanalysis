@@ -1,5 +1,5 @@
 
-from py2neo import Graph, Node, Relationship
+from py2neo import Graph, Node, Relationship, authenticate
 # from py2neo.server import GraphSever
 import numpy as np
 import scipy
@@ -10,7 +10,8 @@ class Network():
     def __init__(self):
         # self.server = GraphSever()
         # self.server.start()
-        self.graph_instance = Graph()
+        authenticate("localhost:7474", "neo4j", "teamqq")
+        self.graph_instance = Graph("http://localhost:7474/db/data/")
 
 
     def add_node(self, link, date_last_updated, frequency):
@@ -145,7 +146,7 @@ class Network():
             self.graph_instance.push(node)
 
 
-     def show_pagerank(self, selector=None, link=None):
+    def show_pagerank(self, selector=None, link=None):
         #Simple show function to get nodes and display their pagerank
         
         nodes = list(self.graph_instance.node_selector.select())
