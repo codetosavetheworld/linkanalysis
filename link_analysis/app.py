@@ -12,6 +12,7 @@ graph = network.Network()
 def welcomePage():
   return "<html><body><h1>Team QQ: Link Analysis</h1><p>Team Members: Sara Khedr, Xini Yang, Enosh Neupane</p></body></html>"
 
+
 @app.route("/prioritizedOutlinks", methods=["POST"])
 def send_prioritized_outlinks():
 	if request.data:

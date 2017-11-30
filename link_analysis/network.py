@@ -1,4 +1,3 @@
-
 from py2neo import Graph, Node, Relationship, authenticate
 # from py2neo.server import GraphSever
 import numpy as np
