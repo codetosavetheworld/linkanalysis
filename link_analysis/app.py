@@ -9,6 +9,11 @@ from datetime import datetime
 app = Flask(__name__)
 graph = network.Network()
 
+@app.route("/")
+def welcomePage():
+  return "<html><body><h1>Team QQ: Link Analysis</h1><p>Team Members: Sara Khedr, Xini Yang, Enosh Neupane</p></body></html>"
+
+
 @app.route("/prioritizedOutlinks", methods=["POST"])
 def send_prioritized_outlinks():
 	if request.data:
@@ -132,4 +137,4 @@ def send_webpage_data():
 
 if __name__ == "__main__":
 	app.config['DEBUG'] = True
-	app.run(host="127.0.0.1", port=80, threaded=True)
+	app.run(host="0.0.0.0", port=80, threaded=True)

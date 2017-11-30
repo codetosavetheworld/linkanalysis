@@ -4,3 +4,5 @@ requests
 py2neo
 network
 datetime
+numpy
+scipy

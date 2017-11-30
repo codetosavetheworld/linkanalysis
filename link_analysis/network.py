@@ -1,5 +1,4 @@
-
-from py2neo import Graph, Node, Relationship
+from py2neo import Graph, Node, Relationship, authenticate
 # from py2neo.server import GraphSever
 import numpy as np
 import scipy
@@ -10,13 +9,14 @@ class Network():
     def __init__(self):
         # self.server = GraphSever()
         # self.server.start()
+        authenticate("localhost:7474", "neo4j", "teamqq")
+        self.graph_instance = Graph("http://localhost:7474/db/data/")
         self.graph_instance = Graph()
         self.time = self.update_time(str(datetime.datetime.now())) 
 
     def update_time(self, time):
         self.time = time
         print self.time
-
 
     def add_node(self, link, date_last_updated, frequency):
         # check if the node exist

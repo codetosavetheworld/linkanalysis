@@ -2,7 +2,7 @@ import requests
 import json
 import urllib
 
-link_analysis_base_url = "http://127.0.0.1"
+link_analysis_base_url = "http://teamqq.cs.rpi.edu"
 prioritized_links_endpoint = link_analysis_base_url + "/prioritizedOutlinks"
 headers = {"Content-Type": "application/json", "Accept":"application/json"}
 
