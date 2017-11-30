@@ -145,28 +145,35 @@ class Network():
             self.graph_instance.push(node)
 
 
-    def show_pagerank(self, selector=None, link=None):
+     def show_pagerank(self, selector=None, link=None):
         #Simple show function to get nodes and display their pagerank
         
-        if selector:
-            nodes = self.graph_instance.node_selector.select(selector)
-        elif link:
-            nodes = [ self.graph_instance.find_one(link) ]
-        else:
-            nodes = self.graph_instance.node_selector.select()
+        nodes = list(self.graph_instance.node_selector.select())
         for node in nodes:
+            if isinstance(link, str):
+                if not list(node.labels())[0] == link:
+                    continue
+            elif isinstance(link, (list, tuple)):
+                if not list(node.labels())[0] in link:
+                    continue
             print(list(node.labels())[0], node.get('page_rank'))
 
 
     def get_pagerank_dict(self, links=[]):
         #Get the pageranks for any given list of links (or all)
         
-        if links:
-            nodes = [self.graph_instance.find_one(link) for link in links]
-        else:
-            nodes = self.graph_instance.node_selector.select()
-        return { list(node.labels())[0] : node.get('page_rank') for node in nodes}
-
+        nodes = list(self.graph_instance.node_selector.select())
+        dct = {}
+        for node in nodes:
+            if isinstance(links, str):
+                if not list(node.labels())[0] == links:
+                    continue
+            elif isinstance(links, (list, tuple)):
+                if not list(node.labels())[0] in links:
+                    continue
+            #print(list(node.labels())[0], node.get('page_rank'))
+            dct[list(node.labels())[0]] = node.get('page_rank')
+        return dct
 
     def _pagerank(
             self,
