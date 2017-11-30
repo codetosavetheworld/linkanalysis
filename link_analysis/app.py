@@ -4,6 +4,7 @@ import json
 import requests
 import network
 import ast
+from datetime import datetime
 
 app = Flask(__name__)
 graph = network.Network()
@@ -23,24 +24,25 @@ def send_prioritized_outlinks():
 		return send_no_json_error()
 
 def parse_session_information(session_information):
-	# try:
-	failed_webpages = session_information["failedWebpages"]
-	for w in failed_webpages:
-		graph.delete_failed_webpages(w)
-	for w in session_information["webpages"]:
-		link = w["link"]
-		date_last_updated = w["dateLastUpdated"]
-		frequency = w["frequency"]
-		outlinks = w["outlinks"]
-		# node_u = graph.get_node(link)
-		node_u = graph.add_node(link,date_last_updated,frequency)
-		# graph.delete_relationship(node_u)
-		for o in outlinks:
-			node_v = graph.add_node(o["link"], "", "")
-			graph.add_edge(node_u,node_v,o["tags"])
+	try:
+		failed_webpages = session_information["failedWebpages"]
+		for w in failed_webpages:
+			graph.delete_failed_webpages(w)
+		for w in session_information["webpages"]:
+			link = w["link"]
+			date_last_updated = w["dateLastUpdated"]
+			frequency = w["frequency"]
+			outlinks = w["outlinks"]
+			# node_u = graph.get_node(link)
+			node_u = graph.add_node(link,date_last_updated,frequency)
+			# graph.delete_relationship(node_u)
+			for o in outlinks:
+				node_v = graph.add_node(o["link"], "", "")
+				graph.add_edge(node_u,node_v,o["tags"])
+		graph.update_time(str(datetime.now()))
 		return 0
-	# except:
-	# 	return -1
+	except:
+		return -1
 
 def send_outlinks_response(prioritized_outlinks):
 	response_data = {}
@@ -74,13 +76,13 @@ def send_no_json_error():
 
 @app.route("/pageRank", methods=["GET"])
 def send_page_rank():
-	print request
 	try:
 		webpages = ast.literal_eval(request.args.get("webpages"))
 		if (len(webpages) == 0):
 			return send_empty_list_error()
-		
-		page_rank_data = {}
+		# ----- DOES NOT BELONG HERE -----
+		graph.update_pagerank()
+		page_rank_data = graph.get_ranking_data(webpages)
 		return send_page_rank_response(page_rank_data)
 	except:
 		return send_no_arguments_error()

@@ -4,6 +4,7 @@ import urllib
 
 link_analysis_base_url = "http://127.0.0.1"
 prioritized_links_endpoint = link_analysis_base_url + "/prioritizedOutlinks"
+page_rank_endpoint = link_analysis_base_url + "/pageRank"
 headers = {"Content-Type": "application/json", "Accept":"application/json"}
 
 def test_sample_session_create():
@@ -17,7 +18,6 @@ def test_sample_session_create():
 	params["link"] = "example.com"
 	r = requests.get(link_analysis_base_url + "/getWebpageData" + "?" + urllib.urlencode(params))
 	json_data = json.loads(r.text)
-	print json_data
 	assert(json_data["inlinks"] == [])
 	assert(json_data["date_last_updated"] == "2017-05-20")
 	assert(json_data["frequency"] == "daily")
@@ -40,6 +40,12 @@ def test_sample_session_create():
 	assert(json_data["frequency"] == "")
 	assert(json_data["outlinks"] == [])
 	assert(json_data["calculated_frequency"] == "")
+
+def test_page_rank():
+	params = {}
+	params["webpages"] = ["example.com", "example2.com", "example3.com"]
+	r = requests.get(page_rank_endpoint + "?" + urllib.urlencode(params))
+	print r.text
 
 def test_sample_session_edit():
 	# Send sample POST session information with changes to webpage metadata
@@ -144,5 +150,6 @@ def session_delete_json():
 
 if __name__ == "__main__":
 	test_sample_session_create()
+	test_page_rank()
 	test_sample_session_edit()
 	test_sample_session_delete()

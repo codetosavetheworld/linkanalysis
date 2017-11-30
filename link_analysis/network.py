@@ -11,14 +11,11 @@ class Network():
         # self.server = GraphSever()
         # self.server.start()
         self.graph_instance = Graph()
-        self.time = self.update_time(str(datetime.datetime.now()))
-    
-    
-    def update_time(self,time):
+        self.time = self.update_time(str(datetime.datetime.now())) 
+
+    def update_time(self, time):
         self.time = time
-    
-    
-    
+
 
 
     def add_node(self, link, date_last_updated, frequency):
@@ -150,6 +147,7 @@ class Network():
             node.update(page_rank= pr)
             self.graph_instance.push(node)
 
+
     def show_pagerank(self, selector=None, link=None):
         #Simple show function to get nodes and display their pagerank
         
@@ -179,6 +177,27 @@ class Network():
             #print(list(node.labels())[0], node.get('page_rank'))
             dct[list(node.labels())[0]] = node.get('page_rank')
         return dct
+
+    def get_ranking_data(self, links):
+        page_ranks = self.get_pagerank_dict(links)
+        data = {}
+        data["webpages"] = []
+        for l in page_ranks.keys():
+            webpage_data = {}
+            # If the node exists
+            if (page_ranks[l] != None):
+                n = self.get_node(l)
+                webpage_data["pageRankValue"] = page_ranks[l]
+                webpage_data["dateLastUpdated"] = n["date_last_updated"]
+                webpage_data["frequency"] = n["frequency"]
+                webpage_data["webpage"] = l
+            else:
+                webpage_data["pageRankValue"] = "NULL"
+                webpage_data["dateLastUpdated"] = ""
+                webpage_data["frequency"] = ""
+                webpage_data["webpage"] = ""
+            data["webpages"].append(webpage_data)
+        return data
 
     def _pagerank(
             self,
