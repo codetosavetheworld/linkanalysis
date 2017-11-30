@@ -251,7 +251,7 @@ class Network():
             current = str(datetime.datetime.now())
             node = self.get_node(ol)
             node["last_crawled_time"] = current
-            #node.push()
+            node.push()
         return new_links
 
 
