@@ -11,6 +11,11 @@ class Network():
         # self.server = GraphSever()
         # self.server.start()
         self.graph_instance = Graph()
+        self.time = self.update_time(str(datetime.datetime.now())) 
+
+    def update_time(self, time):
+        self.time = time
+        print self.time
 
 
     def add_node(self, link, date_last_updated, frequency):
@@ -145,7 +150,7 @@ class Network():
             self.graph_instance.push(node)
 
 
-     def show_pagerank(self, selector=None, link=None):
+    def show_pagerank(self, selector=None, link=None):
         #Simple show function to get nodes and display their pagerank
         
         nodes = list(self.graph_instance.node_selector.select())
