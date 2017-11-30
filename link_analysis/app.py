@@ -37,8 +37,8 @@ def parse_session_information(session_information):
 			node_u = graph.add_node(link,date_last_updated,frequency)
 			# graph.delete_relationship(node_u)
 			for o in outlinks:
-				node_v = graph.add_node(o["link"], "", "")
-				graph.add_edge(node_u,node_v,o["tags"])
+				# node_v = graph.add_node(o["link"], "", "")
+				graph.add_edge(node_u,o["link"],o["tags"])
 		graph.update_time(str(datetime.now()))
 		return 0
 	except:

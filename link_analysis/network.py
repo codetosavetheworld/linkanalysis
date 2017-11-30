@@ -52,6 +52,7 @@ class Network():
     def add_edge(self, node_u, node_v_link, relationship):
         #if the relationship not exist create new edge
         #else update the tag
+        print "node_v_link:", node_v_link
         self.add_node(node_v_link, "","")
         node_v = self.get_node(node_v_link)
         self.graph_instance.create(Relationship(node_u, "links_to", node_v, tag = relationship))
