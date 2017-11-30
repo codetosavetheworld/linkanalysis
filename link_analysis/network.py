@@ -292,7 +292,8 @@ class Network():
         count = 0
         nodes = self.graph_instance.data("MATCH (n) RETURN n")
         for n in nodes:
-            self.remaining_time(n["n"]["link"])
+            if (not n["n"]["link"] in outlinks):
+                self.remaining_time(n["n"]["link"])
         nodes = self.graph_instance.data("MATCH (n) RETURN n ORDER BY (n.time_remaining) DESC")
         for n in nodes:
             link =n["n"]["link"]
@@ -301,6 +302,18 @@ class Network():
                 count = count +1
             if (count + num >100):
                 break
+    
+    def prioritize_dic(self,outlinks):
+        new_links = self.prioritizer(outlinks)
+        data = {}
+        data["prioritizedLinks"] = []
+        for l in new_links:
+            l_data = {}
+            l_data["link"] = l
+            l_data["priority_value"] = self.get_node(l)["time_remaining"]
+            data["prioritizedLinks"].append(l_data)
+        return data
+
 
 
 def convert_frequency_to_hours(frequency):
