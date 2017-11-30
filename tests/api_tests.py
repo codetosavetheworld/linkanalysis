@@ -13,7 +13,7 @@ def test_prioritized_outlinks_API():
 	# assert(r.text == "Cannot retrieve POSTed data")
 
 	# Test incorrectly POSTed data
-	# data = make_incorrect_session_info()
+	data = make_incorrect_session_info()
 	# r = requests.post(prioritized_links_endpoint, data=data, headers=headers)
 	# assert(r.status_code == 400)
 	# assert(r.text == "Incorrect JSON format")

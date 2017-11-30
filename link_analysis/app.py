@@ -13,36 +13,40 @@ graph = network.Network()
 def send_prioritized_outlinks():
 	if request.data:
 		json_data = request.get_json()
-		parse_success = parse_session_information(json_data)
-		if (parse_success == -1):
+		outlinks = parse_session_information(json_data)
+		if (outlinks == -1):
 			return send_incorrect_json_error()
 
-		prioritized_outlinks = []
+		prioritized_outlinks = graph.prioritizer(outlinks)
+		print prioritized_outlinks
 		return send_outlinks_response(prioritized_outlinks)
 		
 	else:
 		return send_no_json_error()
 
 def parse_session_information(session_information):
-	try:
-		failed_webpages = session_information["failedWebpages"]
-		for w in failed_webpages:
-			graph.delete_failed_webpages(w)
-		for w in session_information["webpages"]:
-			link = w["link"]
-			date_last_updated = w["dateLastUpdated"]
-			frequency = w["frequency"]
-			outlinks = w["outlinks"]
-			# node_u = graph.get_node(link)
-			node_u = graph.add_node(link,date_last_updated,frequency)
-			# graph.delete_relationship(node_u)
-			for o in outlinks:
-				# node_v = graph.add_node(o["link"], "", "")
-				graph.add_edge(node_u,o["link"],o["tags"])
-		graph.update_time(str(datetime.now()))
-		return 0
-	except:
-		return -1
+	# try:
+	outlink_links = []
+	failed_webpages = session_information["failedWebpages"]
+	for w in failed_webpages:
+		graph.delete_failed_webpages(w)
+	for w in session_information["webpages"]:
+		link = w["link"]
+		date_last_updated = w["dateLastUpdated"]
+		frequency = w["frequency"]
+		outlinks = w["outlinks"]
+		# node_u = graph.get_node(link)
+		node_u = graph.add_node(link,date_last_updated,frequency)
+		# graph.delete_relationship(node_u)
+		for o in outlinks:
+			print "o:", o
+			# node_v = graph.add_node(o["link"], "", "")
+			graph.add_edge(node_u,o["link"],o["tags"])
+			outlink_links.append(o["link"])
+	graph.update_time(str(datetime.now()))
+	return outlink_links
+	# except:
+	# 	return -1
 
 def send_outlinks_response(prioritized_outlinks):
 	response_data = {}

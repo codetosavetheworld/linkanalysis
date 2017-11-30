@@ -235,7 +235,7 @@ class Network():
 
     #Prioritizer
     def prioritizer(self,outlinks):
-        
+
         #get remaining time and number of inlink
         for ol in outlinks:
             if (not self.check_node_exist(ol)):
@@ -254,6 +254,11 @@ class Network():
             node["last_crawled_time"] = current
             #node.push()
         return new_links
+
+    # def get_prioritized_links(self, new_links):
+    #     data = {}
+    #     for o in new_links:
+            
 
 
     #Get number of inlink
