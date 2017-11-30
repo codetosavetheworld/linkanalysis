@@ -52,6 +52,7 @@ class Network():
     def add_edge(self, node_u, node_v_link, relationship):
         #if the relationship not exist create new edge
         #else update the tag
+        print "node_v_link:", node_v_link
         self.add_node(node_v_link, "","")
         node_v = self.get_node(node_v_link)
         self.graph_instance.create(Relationship(node_u, "links_to", node_v, tag = relationship))
@@ -234,7 +235,7 @@ class Network():
 
     #Prioritizer
     def prioritizer(self,outlinks):
-        
+
         #get remaining time and number of inlink
         for ol in outlinks:
             if (not self.check_node_exist(ol)):
@@ -253,6 +254,11 @@ class Network():
             node["last_crawled_time"] = current
             node.push()
         return new_links
+
+    # def get_prioritized_links(self, new_links):
+    #     data = {}
+    #     for o in new_links:
+            
 
 
     #Get number of inlink
