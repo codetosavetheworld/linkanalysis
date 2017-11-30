@@ -199,6 +199,34 @@ class Network():
                 return pr
         raise Exception("pagerank failed to converge [%d iterations]"%(i+1))
 
+
+
+    #Prioritizer
+    def prioritizer(self,outlinks):
+        #get remaining time and number of inlink
+        for ol in outlinks:
+            if (self.check_node_exist(ol)):
+                node = self.get_node(ol)
+                number_inlinks = len(list(self.graph_instance.match(rel_type="links to",end_node= node,start_node = None)))
+                node["number_inlink"] = number_inlinks
+                node.push()
+
+        new_links = sorted(outlinks, key = lambda k: -self.get_node(k)["number_inlink"])
+        for ol in new_links:
+            print(ol)
+
+
+
+
+
+
+
+
+
+
+
+
+
 def convert_frequency_to_hours(frequency):
     if (frequency == "always"):
         return 0
