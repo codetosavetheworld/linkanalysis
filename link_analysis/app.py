@@ -17,7 +17,7 @@ def send_prioritized_outlinks():
 		if (outlinks == -1):
 			return send_incorrect_json_error()
 
-		prioritized_outlinks = graph.prioritizer(outlinks)
+		prioritized_outlinks = graph.prioritize_dic(outlinks)
 		print prioritized_outlinks
 		return send_outlinks_response(prioritized_outlinks)
 		

@@ -35,6 +35,7 @@ class Network():
             n["calculated_frequency"] = calculated_frequency
             n["frequency"] = frequency
             n.push()
+            print "ADDING NODE:", link, calculated_frequency
         return n
 
 
@@ -255,12 +256,6 @@ class Network():
             node.push()
         return new_links
 
-    # def get_prioritized_links(self, new_links):
-    #     data = {}
-    #     for o in new_links:
-            
-
-
     #Get number of inlink
     def number_of_inlinks(self,outlink):
         node = self.get_node(outlink)
@@ -271,6 +266,7 @@ class Network():
     def remaining_time(self,outlink):
      
         node = self.get_node(outlink);
+        print node
         last_crawled_time = node["last_crawled_time"]
    
         if (last_crawled_time == None):
@@ -282,6 +278,7 @@ class Network():
             start = datetime.datetime.strptime(current[:19],fmt)
             end = datetime.datetime.strptime(last_crawled_time[:19],fmt)
             diff = (start-end).total_seconds()/60.000/60.000
+            print "CALCULATED_FREQUENCY:", node["calculated_frequency"]
             diff = float(node["calculated_frequency"]) - diff
             node["time_remaining"] = diff
             node.push()
@@ -332,6 +329,6 @@ def convert_frequency_to_hours(frequency):
     elif (frequency == "never"):
         return 365*24
     elif (frequency == ""):
-        return ""
+        return 0
 
 
