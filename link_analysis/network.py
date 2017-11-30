@@ -34,6 +34,7 @@ class Network():
             n["calculated_frequency"] = calculated_frequency
             n["frequency"] = frequency
             n.push()
+            print "ADDING NODE:", link, calculated_frequency
         return n
 
 
@@ -48,15 +49,14 @@ class Network():
             return -1
 
 
-    def add_edge(self, node_u, node_v, relationship):
+    def add_edge(self, node_u, node_v_link, relationship):
         #if the relationship not exist create new edge
         #else update the tag
-        if not self.check_relationship_exist(node_u,node_v):
-            self.graph_instance.create(Relationship(node_u, "links_to", node_v, tag = relationship))
-        else:
-            for l in list(self.graph_instance.match(start_node = node_u, end_node = node_v, rel_type = "links_to")):
-                l["tag"] = relationship
-                l.push()
+        print "node_v_link:", node_v_link
+        self.add_node(node_v_link, "","")
+        node_v = self.get_node(node_v_link)
+        self.graph_instance.create(Relationship(node_u, "links_to", node_v, tag = relationship))
+
 
     def check_node_exist(self, link):
         return len(list(self.graph_instance.find(link))) != 0
@@ -235,27 +235,80 @@ class Network():
 
     #Prioritizer
     def prioritizer(self,outlinks):
+
         #get remaining time and number of inlink
         for ol in outlinks:
-            if (self.check_node_exist(ol)):
-                node = self.get_node(ol)
-                number_inlinks = len(list(self.graph_instance.match(rel_type="links to",end_node= node,start_node = None)))
-                node["number_inlink"] = number_inlinks
-                node.push()
-
-        new_links = sorted(outlinks, key = lambda k: -self.get_node(k)["number_inlink"])
+            if (not self.check_node_exist(ol)):
+                outlinks.remove(ol)
+            else:
+                self.remaining_time(ol)
+    
+        self.sort_node(outlinks)
+        new_links = sorted(outlinks, key = lambda k: (self.get_node(k)["time_remaining"],self.number_of_inlinks(k)))
+        
         for ol in new_links:
-            print(ol)
+            print ol
+            #update last_crawled_time
+            current = str(datetime.datetime.now())
+            node = self.get_node(ol)
+            node["last_crawled_time"] = current
+            node.push()
+        return new_links
+
+    #Get number of inlink
+    def number_of_inlinks(self,outlink):
+        node = self.get_node(outlink)
+        return -len(list(self.graph_instance.match(rel_type="links_to",end_node= node,start_node = None)))
 
 
+    #Get remaining time
+    def remaining_time(self,outlink):
+     
+        node = self.get_node(outlink);
+        print node
+        last_crawled_time = node["last_crawled_time"]
+   
+        if (last_crawled_time == None):
+            node["time_remaining"] = 0
+            node.push()
+        else:
+            fmt = '%Y-%m-%d %H:%M:%S'
+            current = str(datetime.datetime.now())
+            start = datetime.datetime.strptime(current[:19],fmt)
+            end = datetime.datetime.strptime(last_crawled_time[:19],fmt)
+            diff = (start-end).total_seconds()/60.000/60.000
+            print "CALCULATED_FREQUENCY:", node["calculated_frequency"]
+            diff = float(node["calculated_frequency"]) - diff
+            node["time_remaining"] = diff
+            node.push()
 
-
-
-
-
-
-
-
+    #sort node and fill top 100
+    def sort_node(self,outlinks):
+        num = len(outlinks)
+        count = 0
+        nodes = self.graph_instance.data("MATCH (n) RETURN n")
+        for n in nodes:
+            if (not n["n"]["link"] in outlinks):
+                self.remaining_time(n["n"]["link"])
+        nodes = self.graph_instance.data("MATCH (n) RETURN n ORDER BY (n.time_remaining) DESC")
+        for n in nodes:
+            link =n["n"]["link"]
+            if (not link in outlinks):
+                outlinks.append(link)
+                count = count +1
+            if (count + num >100):
+                break
+    
+    def prioritize_dic(self,outlinks):
+        new_links = self.prioritizer(outlinks)
+        data = {}
+        data["prioritizedLinks"] = []
+        for l in new_links:
+            l_data = {}
+            l_data["link"] = l
+            l_data["priority_value"] = self.get_node(l)["time_remaining"]
+            data["prioritizedLinks"].append(l_data)
+        return data
 
 
 
@@ -273,8 +326,8 @@ def convert_frequency_to_hours(frequency):
     elif (frequency == "yearly"):
         return 365*24
     elif (frequency == "never"):
-        return -1
+        return 365*24
     elif (frequency == ""):
-        return ""
+        return 0
 
 

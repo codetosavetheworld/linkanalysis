@@ -31,7 +31,7 @@ def test_sample_session_create():
 	assert(json_data["date_last_updated"] == "")
 	assert(json_data["frequency"] == "")
 	assert(json_data["outlinks"] == [])
-	assert(json_data["calculated_frequency"] == "")
+	assert(json_data["calculated_frequency"] == 0)
 
 	params["link"] = "example3.com"
 	r = requests.get(link_analysis_base_url + "/getWebpageData" + "?" + urllib.urlencode(params))
@@ -39,7 +39,7 @@ def test_sample_session_create():
 	assert(json_data["date_last_updated"] == "")
 	assert(json_data["frequency"] == "")
 	assert(json_data["outlinks"] == [])
-	assert(json_data["calculated_frequency"] == "")
+	assert(json_data["calculated_frequency"] == 0)
 
 def test_page_rank():
 	params = {}
@@ -81,7 +81,7 @@ def test_sample_session_delete():
 	assert(json_data["date_last_updated"] == "")
 	assert(json_data["frequency"] == "")
 	assert(json_data["outlinks"] == [])
-	assert(json_data["calculated_frequency"] == "")
+	assert(json_data["calculated_frequency"] == 0)
 
 	params["link"] = "example3.com"
 	r = requests.get(link_analysis_base_url + "/getWebpageData" + "?" + urllib.urlencode(params))
@@ -89,7 +89,7 @@ def test_sample_session_delete():
 	assert(json_data["date_last_updated"] == "")
 	assert(json_data["frequency"] == "")
 	assert(json_data["outlinks"] == [])
-	assert(json_data["calculated_frequency"] == "")
+	assert(json_data["calculated_frequency"] == 0)
 
 def session_create_json():
 	sample_json = '''
