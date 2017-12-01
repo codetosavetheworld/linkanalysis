@@ -1,7 +1,0 @@
-Traceback (most recent call last):
-  File "app.py", line 5, in <module>
-    import network
-  File "/home/khedrs/linkanalysis/link_analysis/network.py", line 148
-    def show_pagerank(self, selector=None, link=None):
-                                                     ^
-IndentationError: unindent does not match any outer indentation level
