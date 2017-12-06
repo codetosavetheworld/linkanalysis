@@ -304,11 +304,13 @@ class Network():
         new_links = self.prioritizer(outlinks)
         data = {}
         data["prioritizedLinks"] = []
+        p_value = 1
         for l in new_links:
             l_data = {}
             l_data["link"] = l
-            l_data["priority_value"] = self.get_node(l)["time_remaining"]
+            l_data["priority_value"] = p_value*10
             data["prioritizedLinks"].append(l_data)
+            p_value = p_value + 1 
         return data
 
 
