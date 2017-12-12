@@ -4,6 +4,7 @@ import os
 execfile("../link_analysis/network.py")
 network = Network()
 
+# Tests initial calculated frequency
 def test_calculated_frequency():
 	assert(network._update_calculated_frequency("2017-05-20", "2017-05-20") == 0.0)
 	assert(network._update_calculated_frequency("2017-05-20", "2017_05-20") == -1)

@@ -2,14 +2,11 @@ from flask import Flask, render_template, request
 import sys
 import json
 import requests
-import network
+execfile("../link_analysis/network.py")
 
-
-
-
-
-
+# Unit tests for network functions
 def parse_session_information(session_info):
+    # Gets information from sample session
     sessionID = session_info["sessionID"]
     webpage = session_info["webpages"][0]["link"]
     date_last_updated = session_info["webpages"][0]["date_last_updated"]
@@ -19,22 +16,18 @@ def parse_session_information(session_info):
     relationship = outlinks[0]["tags"]
     failed_webpages = session_info["failed_webpages"][0]
 
-
-    #add nodes
-    test_network = network.Network()
+    # Initialize a network
+    test_network = Network()
+    # Test add node
     test_network.add_node(webpage,date_last_updated,frequency)
+    # Test delete node
     test_network.delete_relationship(test_network.get_node(webpage))
+    # Test add edge
     test_network.add_edge(test_network.get_node(webpage),outlinks_webpage,relationship)
+    # Test deleting a failed webpage
     test_network.delete_failed_webpages(failed_webpages)
 
-
-
-
-
-
-
-
-# --- Functions for premilimary testing (will be removed) ---
+# Creates a sample session
 def make_sample_session_info():
     sample_session_info = {}
     sample_session_info["sessionID"] = 1
@@ -55,14 +48,9 @@ def make_sample_session_info():
     json_data = json.dumps(sample_session_info)
     return json_data
 
-
-
-
 def main():
     session_info = make_sample_session_info()
     session_info = json.loads(session_info)
     parse_session_information(session_info)
-
-
 
 main()

@@ -5,7 +5,6 @@ import requests
 execfile("../link_analysis/network.py")
 network = Network()
 
-
 def parse_session_information(session_info):
     sessionID = session_info["sessionID"]
     webpage = session_info["webpages"][0]["link"]
@@ -16,8 +15,7 @@ def parse_session_information(session_info):
     relationship = outlinks[0]["tags"]
     failed_webpages = session_info["failed_webpages"][0]
     
-    
-    #add nodes
+    # Add nodes from a sample sestion
     test_network = network.Network()
     test_network.add_node(webpage,date_last_updated,frequency)
     test_network.add_edge(network.get_node(webpage),outlinks_webpage,relationship)
@@ -25,7 +23,7 @@ def parse_session_information(session_info):
 
 #Test number_of_inlinks function
 def test_number_of_inlinks():
-    #Create 3 nodes. node1, node2 links to nodes 3. node1 also links to node2.
+    # Create 3 nodes. node1, node2 links to nodes 3. node1 also links to node2.
     network.add_node("www.node1.com","","")
     network.add_edge(network.get_node("www.node1.com"),"www.node3.com","h2")
     network.add_edge(network.get_node("www.node1.com"),"www.node2.com","h1")
@@ -33,34 +31,11 @@ def test_number_of_inlinks():
     assert(network.number_of_inlinks("www.node1.com") == 0)
     assert(network.number_of_inlinks("www.node2.com") == -1)
     assert(network.number_of_inlinks("www.node3.com") == -2)
-    #clear data for other test
+    # Clear data for other test
     network.graph_instance.delete_all()
 
 
-#Test remaining_time function
-'''def test_remaining_time():
-    network.add_node("n1","","always")
-    n1 = network.get_node("n1")
-    n1["last_crawled_time"] = "2017-11-16 10:50:00"
-    n1.push()
-    network.remaining_time("n1")
-    assert(n1["time_remaining"] == -1)
-    network.add_node("n2","","hourly")
-    n2 = network.get_node("n2")
-    n2["last_crawled_time"] = "2017-11-16 10:50:00"
-    n2.push()
-    network.remaining_time("n2")
-    assert(n2["time_remaining"] == 0)
-    network.add_node("n3","","")
-    n3 = network.get_node("n3")
-    network.remaining_time("n3")
-    assert(n3["time_remaining"] == 0)
-    n2["last_crawled_time"] = "2017-11-16 12:40:00"
-    n2.push()
-    network.remaining_time("n2", "2017-11-16 12:50:00")
-    assert(n3["time_remaining"] == float(50/60))'''
-
-#Test prioritizer function
+#Test prioritizer function and priority
 def test_prioritizer():
     network.add_edge(network.get_node("n1"),"n4","h4")
     network.add_node("n4","","always")
@@ -72,21 +47,10 @@ def test_prioritizer():
     for o in outlinks:
         print o
 
-
-
-    
-
-
 def main():
-    #test_network = network.Network()
     test_number_of_inlinks()
-    test_remaining_time()
-     #outlinks = ["www.example1.com","www.example3.com","www.example5.com","www.example4.com","www.exmapledelete.com"]
-    #test_network.prioritizer(outlinks)
-    
+    test_remaining_time()  
     test_prioritizer()
-
-
 
 main()
 
