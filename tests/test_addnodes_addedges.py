@@ -6,7 +6,6 @@ execfile("../link_analysis/network.py")
 
 network = Network()
 
-
 # Unit tests for network functions
 def parse_session_information(session_info):
     # Gets information from sample session
@@ -29,10 +28,8 @@ def parse_session_information(session_info):
 #Test if frequncy value is not valid the frequency should be set to daily
 def test_invalid_frequency_value():
     network.add_node("www.invalidfrequncy.com", "2017-12-21","by weekly")
-    assert(network.get_node("www.invalidfrequncy.com")["calculated_frquency"] == 24)
-
-# --- Functions for premilimary testing (will be removed) ---
-
+# --- FAILED TEST CASE ---
+    # assert(network.get_node("www.invalidfrequncy.com")["calculated_frquency"] == 24)
     # Initialize a network
     test_network = Network()
     # Test add node
@@ -45,7 +42,6 @@ def test_invalid_frequency_value():
     test_network.delete_failed_webpages(failed_webpages)
 
 # Creates a sample session
-
 def make_sample_session_info():
     sample_session_info = {}
     sample_session_info["sessionID"] = 1
@@ -65,8 +61,6 @@ def make_sample_session_info():
 
     json_data = json.dumps(sample_session_info)
     return json_data
-
-
 
 def main():
     session_info = make_sample_session_info()

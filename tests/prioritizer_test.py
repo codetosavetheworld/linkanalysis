@@ -32,7 +32,6 @@ def test_number_of_inlinks():
     assert(network.number_of_inlinks("www.node3.com") == -2)
     network.graph_instance.delete_all()
 
-
 #Test if priorizter function return error when webpage is not exist
 def failed_test_nonexist_webpage():
     outlinks = ["www.one.com"]
@@ -55,7 +54,6 @@ def main():
     failed_test_nonexist_webpage()
     failed_test_valid_prioritizing_value()
     
-
 main()
 
 

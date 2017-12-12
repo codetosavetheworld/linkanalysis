@@ -1,6 +1,6 @@
 from __future__ import print_function
 import unittest
-from network import Network
+execfile("../link_analysis/network.py")
 import numpy as np
 import numpy.testing
 

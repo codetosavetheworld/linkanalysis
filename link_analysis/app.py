@@ -95,6 +95,7 @@ def send_page_rank():
 
 # Returns a successful page rank response to /pageRank GET request
 def send_page_rank_response(page_rank_data):
+
     response = app.response_class(
         response = json.dumps(page_rank_data),
         status = 200,
@@ -138,7 +139,6 @@ def send_webpage_data():
         mimetype = "application/json"
     )
     return response
-
 
 if __name__ == "__main__":
     app.config['DEBUG'] = True
