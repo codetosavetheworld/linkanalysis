@@ -1,6 +1,5 @@
 
 from py2neo import Graph, Node, Relationship
-# from py2neo.server import GraphSever
 import numpy as np
 import scipy
 import scipy.sparse
@@ -8,26 +7,22 @@ import datetime
 
 class Network():
     def __init__(self):
-        # self.server = GraphSever()
-        # self.server.start()
         self.graph_instance = Graph()
         self.time = self.update_time(str(datetime.datetime.now())) 
 
+    # Updates current instance of time by system 
     def update_time(self, time):
         self.time = time
 
-
-
+    # Checks if node exists, if it does not exist - creates new node; else, updates node
     def add_node(self, link, date_last_updated, frequency):
-        # check if the node exist
-        # if node not exist create a new node
-        # if node exist update the node
         calculated_frequency = convert_frequency_to_hours(frequency)
         if (not self.check_node_exist(link)):
-            # Calculate initial calculated frequency
+            # Create a new node for webpage with an initial calculated frequency
             n = Node(link, date_last_updated = date_last_updated, frequency = frequency, calculated_frequency = calculated_frequency, link=link)
             self.graph_instance.create(n)
         else:
+            # Update existing fields for webpage node
             n = self.graph_instance.find_one(link)
             if (n["date_last_updated"] != ""):
                 calculated_frequency = self._update_calculated_frequency(n["date_last_updated"], date_last_updated)
@@ -35,7 +30,6 @@ class Network():
             n["calculated_frequency"] = calculated_frequency
             n["frequency"] = frequency
             n.push()
-            print "ADDING NODE:", link, calculated_frequency
         return n
 
 
@@ -49,11 +43,8 @@ class Network():
         except:
             return -1
 
-
+    # If the relationship doesn't exist, create a new edge; else, update the tag
     def add_edge(self, node_u, node_v_link, relationship):
-        #if the relationship not exist create new edge
-        #else update the tag
-        print "node_v_link:", node_v_link
         self.add_node(node_v_link, "","")
         node_v = self.get_node(node_v_link)
         self.graph_instance.create(Relationship(node_u, "links_to", node_v, tag = relationship))
@@ -123,10 +114,8 @@ class Network():
             inlinks.append(o["node"]["link"])
         return inlinks
 
+    # Get adjacency matrix from Neo4j and nodes from py2neo
     def _to_matrix(self):
-        #Get adjacency matrix of the neo4j graph
-        #to be used for pagerank
-        # Get the nodes from py2neo
         nodes = list(self.graph_instance.node_selector.select())
         N = len(nodes)
         mat = np.zeros((N,N))
@@ -137,10 +126,8 @@ class Network():
                 mat[i,j] = self.check_relationship_exist(a, b)
         return mat
 
-
+    #Iterate over nodes and add pagerank
     def update_pagerank(self):
-        #Iterate over nodes and add pagerank
-        
         # Get all the nodes
         nodes = self.graph_instance.node_selector.select()
         # Iterate over the result of _pagerank and the nodes
@@ -149,10 +136,8 @@ class Network():
             node.update(page_rank= pr)
             self.graph_instance.push(node)
 
-
+    # Simple show function to get nodes and display their pagerank
     def show_pagerank(self, selector=None, link=None):
-        #Simple show function to get nodes and display their pagerank
-        
         nodes = list(self.graph_instance.node_selector.select())
         for node in nodes:
             if isinstance(link, str):
@@ -161,12 +146,9 @@ class Network():
             elif isinstance(link, (list, tuple)):
                 if not list(node.labels())[0] in link:
                     continue
-            print(list(node.labels())[0], node.get('page_rank'))
 
-
+    # Get the pageranks for any given list of links (or all)
     def get_pagerank_dict(self, links=[]):
-        #Get the pageranks for any given list of links (or all)
-        
         nodes = list(self.graph_instance.node_selector.select())
         dct = {}
         for node in nodes:
@@ -176,10 +158,10 @@ class Network():
             elif isinstance(links, (list, tuple)):
                 if not list(node.labels())[0] in links:
                     continue
-            #print(list(node.labels())[0], node.get('page_rank'))
             dct[list(node.labels())[0]] = node.get('page_rank')
         return dct
 
+    # Creates dictionary object with information for ranking API (including page rank)
     def get_ranking_data(self, links):
         page_ranks = self.get_pagerank_dict(links)
         data = {}
@@ -201,14 +183,13 @@ class Network():
             data["webpages"].append(webpage_data)
         return data
 
+    # Perform pagerank on the adjacency matrix, using the power method
     def _pagerank(
             self,
             alpha=0.85,
             max_iter=100,   # Increase this if we get the non-convergence error
             tol=1.0e-6,
             ):
-        
-        #Perform pagerank on the adjacency matrix, using the power method
         # Create a sparse matrix rep. of adjacency matrix
         mat = scipy.sparse.csr_matrix(self._to_matrix())
         n,m = mat.shape
@@ -234,10 +215,9 @@ class Network():
 
 
 
-    #Prioritizer
+    # Prioritizer
     def prioritizer(self,outlinks):
-
-        #get remaining time and number of inlink
+        # Get remaining time and number of inlink
         for ol in outlinks:
             if (not self.check_node_exist(ol)):
                 outlinks.remove(ol)
@@ -249,20 +229,20 @@ class Network():
         
         for ol in new_links:
             print ol
-            #update last_crawled_time
+            # Update last_crawled_time
             current = str(datetime.datetime.now())
             node = self.get_node(ol)
             node["last_crawled_time"] = current
             node.push()
         return new_links
 
-    #Get number of inlink
+    # Get number of inlink
     def number_of_inlinks(self,outlink):
         node = self.get_node(outlink)
         return -len(list(self.graph_instance.match(rel_type="links_to",end_node= node,start_node = None)))
 
 
-    #Get remaining time
+    # Updates remaining time left for a node to be crawled based on frequency
     def remaining_time(self,outlink):
      
         node = self.get_node(outlink);
@@ -283,7 +263,7 @@ class Network():
             node["time_remaining"] = diff
             node.push()
 
-    #sort node and fill top 100
+    # Sort node and fill top 100
     def sort_node(self,outlinks):
         num = len(outlinks)
         count = 0
@@ -300,6 +280,7 @@ class Network():
             if (count + num >100):
                 break
     
+    # Return dictionary object of prioritized links and their priority value
     def prioritize_dic(self,outlinks):
         new_links = self.prioritizer(outlinks)
         data = {}
@@ -312,7 +293,6 @@ class Network():
             data["prioritizedLinks"].append(l_data)
             p_value = p_value + 1 
         return data
-
 
 
 def convert_frequency_to_hours(frequency):
