@@ -5,7 +5,6 @@ import requests
 execfile("../link_analysis/network.py")
 network = Network()
 
-
 def parse_session_information(session_info):
     sessionID = session_info["sessionID"]
     webpage = session_info["webpages"][0]["link"]
@@ -15,13 +14,10 @@ def parse_session_information(session_info):
     outlinks_webpage = outlinks[0]["link"]
     relationship = outlinks[0]["tags"]
     failed_webpages = session_info["failed_webpages"][0]
-    
-    
     #add nodes
     test_network = network.Network()
     test_network.add_node(webpage,date_last_updated,frequency)
     test_network.add_edge(network.get_node(webpage),outlinks_webpage,relationship)
-
 
 #Test number_of_inlinks function
 def test_number_of_inlinks():
@@ -34,59 +30,27 @@ def test_number_of_inlinks():
     assert(network.number_of_inlinks("www.node2.com") == -1)
     assert(network.number_of_inlinks("www.node3.com") == -2)
     #clear data for other test
-    network.graph_instance.delete_all()
 
-
-#Test remaining_time function
-'''def test_remaining_time():
-    network.add_node("n1","","always")
-    n1 = network.get_node("n1")
-    n1["last_crawled_time"] = "2017-11-16 10:50:00"
-    n1.push()
-    network.remaining_time("n1")
-    assert(n1["time_remaining"] == -1)
-    network.add_node("n2","","hourly")
-    n2 = network.get_node("n2")
-    n2["last_crawled_time"] = "2017-11-16 10:50:00"
-    n2.push()
-    network.remaining_time("n2")
-    assert(n2["time_remaining"] == 0)
-    network.add_node("n3","","")
-    n3 = network.get_node("n3")
-    network.remaining_time("n3")
-    assert(n3["time_remaining"] == 0)
-    n2["last_crawled_time"] = "2017-11-16 12:40:00"
-    n2.push()
-    network.remaining_time("n2", "2017-11-16 12:50:00")
-    assert(n3["time_remaining"] == float(50/60))'''
-
-#Test prioritizer function
-def test_prioritizer():
-    network.add_edge(network.get_node("n1"),"n4","h4")
-    network.add_node("n4","","always")
-    n4 = network.get_node("n4")
-    n4["last_crawled_time"] = "2017-11-16 10:50:00"
-    n4.push()
-    outlinks = ["n1","n2","n3"]
-    network.prioritizer(outlinks)
-    for o in outlinks:
-        print o
-
-
-
+#Test if priorizter function return error when webpage is not exist
+def failed_test_nonexist_webpage():
+    outlinks = ["www.one.com"]
+    output_link = []
+    assert(network.prioritizer(outlinks) != output_link)
     
-
+#Test if priorizter value if out of range
+def failed_test_valid_prioritizing_value():
+    tmp_string = ["one","two","three","four","five","six","seven","eight","nine","ten","wrong"]
+    for x in range (0, 11):
+        network.add_node(tmp_string[x], "2017-12-21","daily")
+    new = network.prioritize_dic(tmp_string);
+    for l in new["prioritizedLinks"]:
+        assert(["priority_value"]<=100)
 
 def main():
-    #test_network = network.Network()
     test_number_of_inlinks()
-    test_remaining_time()
-     #outlinks = ["www.example1.com","www.example3.com","www.example5.com","www.example4.com","www.exmapledelete.com"]
-    #test_network.prioritizer(outlinks)
-    
-    test_prioritizer()
-
-
+    failed_test_nonexist_webpage()
+    failed_test_valid_prioritizing_value()
+    network.graph_instance.delete_all()
 
 main()
 
