@@ -1,10 +1,10 @@
 from __future__ import print_function
 import unittest
-execfile("../link_analysis/network.py")
+from network import Network
 import numpy as np
 import numpy.testing
 
-# Setup function
+# setup function
 def setup():
     # Start from an empty graph
     n = Network()
@@ -27,9 +27,9 @@ def setup():
 def test_simple_pagerank_check():
     n, n1, n2, n3  = setup()
     np.testing.assert_almost_equal(
-       n._pagerank(),
-       [ 0.2127657, 0.5744686,   0.2127657],
-    )
+                                   n._pagerank(),
+                                   [ 0.2127657, 0.5744686,   0.2127657],
+                                   )
     print("passed test_simple_pagerank_check")
 
 def test_adding_pagerank_to_nodes():
@@ -131,4 +131,5 @@ if __name__ == '__main__':
     test_get_dictionary()
     
     print("All tests passed")
+
 
