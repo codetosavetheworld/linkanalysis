@@ -19,27 +19,20 @@ def parse_session_information(session_info):
     failed_webpages = session_info["failed_webpages"][0]
 
     #add nodes
+    # Test add node
     network.add_node(webpage,date_last_updated,frequency)
+    # Test delete node
     network.delete_relationship(network.get_node(webpage))
+    # Test add edge
     network.add_edge(network.get_node(webpage),outlinks_webpage,relationship)
+    # Test deleting a failed webpage
     network.delete_failed_webpages(failed_webpages)
 
 
 #Test if frequncy value is not valid the frequency should be set to daily
 def test_invalid_frequency_value():
     network.add_node("www.invalidfrequncy.com", "2017-12-21","by weekly")
-# --- FAILED TEST CASE ---
-    # assert(network.get_node("www.invalidfrequncy.com")["calculated_frquency"] == 24)
-    # Initialize a network
-    test_network = Network()
-    # Test add node
-    test_network.add_node(webpage,date_last_updated,frequency)
-    # Test delete node
-    test_network.delete_relationship(test_network.get_node(webpage))
-    # Test add edge
-    test_network.add_edge(test_network.get_node(webpage),outlinks_webpage,relationship)
-    # Test deleting a failed webpage
-    test_network.delete_failed_webpages(failed_webpages)
+    assert(network.get_node("www.invalidfrequncy.com")["calculated_frquency"] == 24)
 
 # Creates a sample session
 def make_sample_session_info():
